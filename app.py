@@ -4,6 +4,7 @@ import sqlite3
 import google.generativeai as genai
 from dotenv import load_dotenv
 import re
+import pandas as pd
 
 # Load environment variables
 load_dotenv()
@@ -26,12 +27,13 @@ def read_sql_query(sql, db):
     try:
         cur.execute(sql)
         rows = cur.fetchall()
+        columns = [description[0] for description in cur.description]  # Get column names
     except sqlite3.OperationalError as e:
-        return str(e)  # Return the error message
+        return str(e), None  # Return error message and None for rows
     finally:
         conn.close()
     
-    return rows
+    return columns, rows
 
 # Define the prompt
 prompt = [
@@ -44,8 +46,8 @@ prompt = [
 ]
 
 # Streamlit App Layout
-st.set_page_config(page_title="I can Retrieve Any SQL query")
-st.header("Gemini App To Retrieve SQL Data")
+st.title("Natural Language to SQL Query Generator")
+st.write("Ask any business-related questions based on the available sales, products, customers, and orders data.")
 
 question = st.text_input("Input: ", key="input")
 submit = st.button("Ask the question")
@@ -56,11 +58,14 @@ if submit:
     st.subheader("Generated SQL Query")
     st.code(response, language='sql')  # Display the SQL query
 
-    result = read_sql_query(response, "mydb.sqlite3")
+    columns, result = read_sql_query(response, "mydb.sqlite3")
     
-    st.subheader("The Response is")
+    st.subheader("Query Results:")
     if isinstance(result, str):  # If the result is an error message
         st.error(result)
+    elif result:  # If there are results
+        # Create a DataFrame and display it
+        df = pd.DataFrame(result, columns=columns)
+        st.dataframe(df)
     else:
-        # Display data in a table format
-        st.write(result)
+        st.write("No results found.")
