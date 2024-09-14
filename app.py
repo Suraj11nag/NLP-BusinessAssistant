@@ -57,8 +57,8 @@ prompt = [
 st.title("Natural Language to SQL Query Generator")
 st.write("Ask any business-related questions based on the available sales, products, customers, and orders data.")
 
-question = st.text_input("Input: ", key="input")
-submit = st.button("Ask the question")
+question = st.text_input("Enter your question:", key="input")
+submit = st.button("Run")
 
 # if submit is clicked
 if submit:
