@@ -38,10 +38,18 @@ def read_sql_query(sql, db):
 # Define the prompt
 prompt = [
     """
-    You are an expert in converting English questions into SQL Queries to answer business-related questions by querying a SQLite database.
+    You are an expert in converting English questions into SQL Queries to answer business-related questions by querying a PostgreSQL database.
     You have access to the following tables: sales, products, customers, and orders.
     Answer user queries based on this data.
-    IMPORTANT: Your response should ONLY include the SQL query, nothing else.
+    Try to get the basic idea when a query is asked and try things to get the desired results.
+    Only return the SQL query, without any additional explanation.
+    You are working with a database schema that includes four tables: **sales**, **products**, **customers**, and **orders**.
+    The **sales** table contains information about each sale. It includes the **id** column, which is an auto-incremented integer serving as the primary key for each sale. The **product_name** column stores the name of the product sold. The **quantity** column indicates the number of units sold, while the **sale_date** column records the date of the sale. Finally, the **total_amount** column represents the total amount of the sale in real currency values.
+    The **products** table holds data on products available for sale. The **id** column is an auto-incremented integer and serves as the primary key for each product. The **name** column provides the name of the product, and the **category** column denotes the category to which the product belongs. The **price** column contains the price of the product in real currency values.
+    In the **customers** table, the **id** column is an auto-incremented integer that uniquely identifies each customer as the primary key. The **name** column records the name of the customer, while the **email** column captures the customer's email address. The **join_date** column indicates the date when the customer joined.
+    Lastly, the **orders** table records each order placed by customers. The **id** column is an auto-incremented integer and serves as the primary key for each order. The **customer_id** column is a foreign key that references the **id** column in the **customers** table, linking the order to a specific customer. The **product_id** column is a foreign key that references the **id** column in the **products** table, associating the order with a specific product. The **order_date** column logs the date of the order, and the **order_amount** column represents the total amount of the order in real currency values.
+    Use this schema to generate SQL queries that retrieve relevant data from these tables based on user queries.
+
     """
 ]
 
@@ -59,13 +67,12 @@ if submit:
     st.code(response, language='sql')  # Display the SQL query
 
     columns, result = read_sql_query(response, "mydb.sqlite3")
-    
+
     st.subheader("Query Results:")
-    if isinstance(result, str):  # If the result is an error message
-        st.error(result)
-    elif result:  # If there are results
-        # Create a DataFrame and display it
+    if isinstance(columns, str):  # If the result is an error message
+        st.error(f"Error executing query: {columns}")
+    elif result:
         df = pd.DataFrame(result, columns=columns)
-        st.dataframe(df)
+        st.write(df)  # Display results as a table
     else:
         st.write("No results found.")
