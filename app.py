@@ -50,6 +50,19 @@ prompt = [
     Lastly, the **orders** table records each order placed by customers. The **id** column is an auto-incremented integer and serves as the primary key for each order. The **customer_id** column is a foreign key that references the **id** column in the **customers** table, linking the order to a specific customer. The **product_id** column is a foreign key that references the **id** column in the **products** table, associating the order with a specific product. The **order_date** column logs the date of the order, and the **order_amount** column represents the total amount of the order in real currency values.
     Use this schema to generate SQL queries that retrieve relevant data from these tables based on user queries.
 
+    IMPORTANT: Use only SQLite-compatible syntax and functions. Specifically:
+    - For date differences, use: CAST((JULIANDAY(date1) - JULIANDAY(date2)) AS INTEGER)
+    - For current date, use: DATE('now')
+    - For date formatting, use: STRFTIME('%Y-%m-%d', date_column)
+    - For year, month, day extraction, use:
+      CAST(STRFTIME('%Y', date_column) AS INTEGER)
+      CAST(STRFTIME('%m', date_column) AS INTEGER)
+      CAST(STRFTIME('%d', date_column) AS INTEGER)
+    - For string concatenation, use the || operator
+    - Instead of ISNULL, use IFNULL
+    - Instead of LEN, use LENGTH
+    - Instead of CHARINDEX, use INSTR
+
     """
 ]
 
